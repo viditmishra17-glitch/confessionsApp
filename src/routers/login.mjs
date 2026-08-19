@@ -17,6 +17,7 @@ const validator=(req,res,next)=>{
     next();
 }
 const authenticator= async (req,res,next)=>{
+    try{
     const email=req.body.email;
     const password=req.body.password;
 
@@ -49,26 +50,34 @@ const authenticator= async (req,res,next)=>{
         })
         res.status(200).send("successfully logged in");
     }
+    }
+    catch(err){
+                console.log(err);
+        return res.status(500).send("server error during login");
+
+    }
     next();
 }
-login.post('/user/refresh',authenticator , (req,res)=>{
 
-    const refreshtoken=req.cookies.REFRESH_COOKIE;
-
-    if(!refreshtoken){
-        res.redirect('/user/login');
-        return res.status(401).send("refresh token couldnt be found, login again");
+login.post('/user/refresh', (req, res) => {
+    const refreshtoken = req.cookies.REFRESH_COOKIE;
+    if (!refreshtoken) {
+        return res.status(401).send("refresh token couldn't be found, login again");
     }
-    try{
-        const decodedpayload=jwt.verify(refreshtoken,process.env.REFRESH_TOKEN_SECRET);
-        const newAccessToken=jwt.sign({id:decodedpayload.id},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1h'});
-        res.cookie('ACCESS_COOKIE',newAccessToken,{maxAge:60*60*100});
+    try {
+        const decodedpayload = jwt.verify(refreshtoken, process.env.REFRESH_TOKEN_SECRET);
+        const newAccessToken = jwt.sign({ id: decodedpayload.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+        res.cookie('ACCESS_COOKIE', newAccessToken, {
+            maxAge: 60 * 60 * 1000,
+            sameSite: "none",
+            secure: true,
+            httpOnly: true
+        });
         return res.status(200).send("access token made");
+    } catch {
+        return res.status(401).send("couldn't log in");
     }
-    catch{
-        return res.status(401).send("couldnt log in");
-    }
-})
+});
 login.post('/user/login',validator,authenticator)
 
 export default login;
