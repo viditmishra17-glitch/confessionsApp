@@ -25,6 +25,8 @@ app.use(display);
 app.use(addconf);
 const PORT=process.env.PORT||3000;
 
-app.listen(PORT,()=>{
-    console.log("running");
-});
+// app.listen(PORT,()=>{
+//     console.log("running");
+// });
+
+export default app;
