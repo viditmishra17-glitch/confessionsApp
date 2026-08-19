@@ -30,10 +30,11 @@ register.post("/user/register", validator,  async (req,res)=>{
     const Hashpassword=req.body.hashPassword;
     try{
         const findemail=await User.findOne({email:email});
-        if(findemail) throw new Error();
+        if (findemail) return res.status(400).send("email already exists, try logging in");
+
     }
-    catch{
-        return res.status(400).send("email already exists, try logging in");
+    catch(e){
+        return res.status(400).send(e);
     }
     try{
         User.create({
