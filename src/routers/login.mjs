@@ -36,10 +36,16 @@ const authenticator= async (req,res,next)=>{
         const accesstoken=jwt.sign({id:user._id},process.env.ACCESS_TOKEN_SECRET,{expiresIn:'1h'});
 
         res.cookie('ACCESS_COOKIE',accesstoken,{
-            maxAge:60*60*100*100
+            maxAge:60*60*100*100,
+            sameSite: "none",
+            secure:true,
+            httpOnly:true
         })
         res.cookie('REFRESH_COOKIE',refreshtoken,{
-            maxAge:30*24*60*60*100
+            maxAge:30*24*60*60*100,
+            sameSite: "none",
+            secure:true,
+            httpOnly:true
         })
         res.status(200).send("successfully logged in");
     }

@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGODB_URL)
 const app=express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({origin: "https://confession-frontend-inky.vercel.app/", credentials: true} ));
+app.use(cors({origin: "https://confession-frontend-inky.vercel.app", credentials: true} ));
 app.use(register);
 app.use(login);
 app.use(display);
