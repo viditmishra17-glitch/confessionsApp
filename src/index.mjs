@@ -9,13 +9,23 @@ import mongoose from "mongoose";
 import cors from 'cors';
 import cookieParser from "cookie-parser";
 dotenv.config();
-mongoose.connect(process.env.MONGODB_URL)
-.then(()=>{
-    console.log("mongodb successfully connected")
-}).catch(()=>{
-    console.log("failed to connect to mongodb");
-})
+let isConnected = false;
+async function connectDB() {
+    if (isConnected) return;
+    await mongoose.connect(process.env.MONGODB_URL);
+    isConnected = true;
+    console.log("mongodb successfully connected");
+}
 const app=express();
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.log("failed to connect to mongodb:", err.message);
+        return res.status(500).send("database connection failed");
+    }
+});
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({origin: "https://confession-frontend-inky.vercel.app", credentials: true} ));
